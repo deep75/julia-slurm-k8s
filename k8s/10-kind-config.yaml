@@ -1,0 +1,22 @@
+# Cluster kind de démonstration local (OPTIONNEL - dev uniquement).
+# Utilisé par scripts/01-kind-cluster.sh :
+#   ./scripts/01-kind-cluster.sh up
+#
+# Contraintes Slinky : Kubernetes >= 1.29 (kubeVersion du chart slurm).
+# Ajustez l'image node à une version >= 1.29 disponible localement.
+# kind embarque un provisioner local-path (StorageClass `standard`) -
+# suffisant pour la persistance de slurmctld en démo.
+
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+name: julia-slurm
+nodes:
+  # À ajuster selon vos images kind disponibles (>= 1.29 requis).
+  - role: control-plane
+    image: kindest/node:v1.31.0
+  - role: worker
+    image: kindest/node:v1.31.0
+  - role: worker
+    image: kindest/node:v1.31.0
+  - role: worker
+    image: kindest/node:v1.31.0

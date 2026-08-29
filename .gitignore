@@ -1,0 +1,26 @@
+# Julia
+Manifest.toml
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+deps/deps.jl
+
+# Environnements locaux
+.env
+env.local.sh
+
+# Artefacts de build
+*.tar
+*.tar.gz
+build/
+dist/
+
+# Slurm / Munge artefacts locaux
+munge.key
+slurm.conf.bak
+
+# kubeconfig locaux kind
+kind-config-generated.yaml
+
+# macOS
+.DS_Store

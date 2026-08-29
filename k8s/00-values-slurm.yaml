@@ -1,0 +1,88 @@
+# values pour le chart Helm `slurm` (Slinky) - cluster orienté Julia.
+# Syntaxe vérifiée contre helm/slurm/values.yaml du dépôt
+# SlinkyProject/slurm-operator v1.3.0-rc1 (Slurm 26.05).
+#
+# Usage :
+#   helm install slurm oci://ghcr.io/slinkyproject/charts/slurm \
+#     --namespace slurm --create-namespace -f k8s/00-values-slurm.yaml \
+#     --set nodesets.julia.slurmd.image.repository="${JULIA_IMAGE_REPO}" \
+#     --set nodesets.julia.slurmd.image.tag="${JULIA_IMAGE_TAG}"
+#
+# Voir docs/03-deploiement-slurm.md pour le champ par champ.
+
+clusterName: julia-cluster
+
+# --- Clé d'authentification Slurm (auth/slurm, PAS munge) --------------------
+# Par défaut le chart génère les secrets. Pour BYO :
+# slurmKey:
+#   create: false
+#   secretRef:
+#     name: slurm-auth-slurm
+#     key: slurm.key
+
+# --- slurmctld (contrôleur) ---------------------------------------------------
+controller:
+  slurmctld:
+    image:
+      repository: ghcr.io/slinkyproject/slurmctld
+      tag: 26.05-ubuntu26.04
+    resources:
+      requests:
+        cpu: "1"
+        memory: 1Gi
+  # État de slurmctld persistant entre les recréations de pod.
+  persistence:
+    enabled: true
+    # storageClassName: standard   # décommentez si le défaut ne convient pas
+
+# --- Pods de login (clients sbatch/srun) --------------------------------------
+# Accès sans SSH : kubectl exec dans le pod (utilisé par les scripts/).
+# Accès SSH : renseignez rootSshAuthorizedKeys (service LoadBalancer créé).
+loginsets:
+  julia:
+    enabled: true
+    replicas: 1
+    # rootSshAuthorizedKeys: |
+    #   ssh-ed25519 AAAA... vous@poste
+
+# --- Nœuds de calcul (slurmd) = pods exécutant les jobs Julia ------------------
+nodesetDefaults:
+  # StatefulSet → noms de pods stables + DNS stable (callback TCP des workers).
+  scalingMode: StatefulSet
+  # Protège les pods via PDB quand des jobs Julia tournent dessus.
+  workloadDisruptionProtection: true
+
+nodesets:
+  julia:
+    enabled: true
+    replicas: 2            # 2 pods slurmd → 2 « nœuds » Slurm
+    slurmd:
+      # Image custom : slurmd + Julia + depot précompilé.
+      # Construite par scripts/03-build-images.sh (docker/julia-slurm/Dockerfile).
+      image:
+        repository: registry.example.org/hpc/julia-slurmd   # À ADAPTER
+        tag: "26.05-julia1.12"
+      resources:
+        requests:
+          cpu: "2"
+          memory: 4Gi
+        limits:
+          cpu: "4"
+          memory: 8Gi
+
+# --- Partition unique contenant tous les NodeSets ------------------------------
+partitions:
+  all:
+    enabled: true
+    nodesets:
+      - ALL
+    configMap:
+      Default: "YES"
+      MaxTime: UNLIMITED
+
+# --- Optionnel : métriques slurmctld pour Prometheus ---------------------------
+# controller:
+#   metrics:
+#     enabled: true
+#     serviceMonitor:
+#       enabled: true

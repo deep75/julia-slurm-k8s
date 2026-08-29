@@ -1,0 +1,12 @@
+# Contexte de build = racine du dépôt. Seul julia/ est copié dans l'image
+# (les sbatch sont soumis depuis le pod de login, hors image).
+.git
+.gitignore
+docs/
+scripts/
+k8s/
+docker/
+julia/Manifest.toml
+julia/sbatch/
+README.md
+*.md
