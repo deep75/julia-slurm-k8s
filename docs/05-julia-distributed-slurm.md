@@ -55,6 +55,24 @@ v1.1.0 (tout autre, `launch_timeout` compris, déclenche un `@warn` et est
 Propagation automatique driver → workers : **`JULIA_PROJECT`**,
 **`JULIA_LOAD_PATH`**, **`JULIA_DEPOT_PATH`** (via `addenv` sur srun).
 
+```mermaid
+flowchart LR
+    subgraph CTOR["SlurmManager(; …) — CONSTRUCTEUR"]
+        direction TB
+        C1["launch_timeout (défaut 60.0 s)"]
+        C2["srun_post_exit_sleep (défaut 0.01 s)"]
+    end
+    subgraph AP["addprocs(mgr; …) — APPEL"]
+        direction TB
+        P1["dir · exename · exeflags · env<br/>(les seuls reconnus)"]
+        PX["tout autre kwarg —<br/>launch_timeout placé ICI = erreur fréquente"]
+    end
+    CTOR --> LAUNCH["Distributed.launch(mgr, params, …)"]
+    P1 --> LAUNCH
+    PX -.->|"warn_if_unexpected_params"| WARN["⚠ @warn : does not support this custom kwarg<br/>→ valeur ignorée (le timeout reste à 60 s)"]
+    LAUNCH --> SRUN["srun -D dir julia exeflags --worker<br/>cookie via stdin · timedwait(…, mgr.launch_timeout)"]
+```
+
 ## 2. Mécanisme interne
 
 ```mermaid

@@ -92,6 +92,19 @@ cas de mort d'un worker (le nombre de tentatives = `length(retry_delays)` ;
 `pmap` n'a **pas** de kwarg `retry_n`), `on_error=rethrow` (fail-fast après
 les tentatives), estimation du speedup par un lot séquentiel de référence.
 
+```mermaid
+flowchart TD
+    T["pmap applique f à l'élément i"] --> E{"exception ?"}
+    E -- non --> OK["résultat conservé"]
+    E -- oui --> R{"tentative k &lt; length(retry_delays) ?"}
+    R -- oui --> D["attendre retry_delays[k]<br/>(ici ones(3) → 1 s)"] --> T
+    R -- "non — 3 tentatives épuisées" --> OE["on_error(e) = rethrow<br/>⇒ pmap s'arrête (fail-fast)"]
+```
+
+> Sans `retry_delays`, une seule exception d'un worker fait échouer tout le
+> `pmap`. Avec, l'élément est re-soumis (sur un autre worker vivant) jusqu'à
+> `length(retry_delays)` fois avant que `on_error` ne tranche.
+
 ## 5. `options` - kwargs et environnement
 
 ```bash
