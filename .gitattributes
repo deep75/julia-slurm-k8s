@@ -11,3 +11,6 @@
 # Documentation : exclue des statistiques de langages.
 docs/** linguist-documentation
 README.md linguist-documentation
+
+# Bundle mermaid (esbuild) : artefact, hors statistiques et diffs.
+docs/src/assets/mermaid.bundle.js linguist-generated=true
