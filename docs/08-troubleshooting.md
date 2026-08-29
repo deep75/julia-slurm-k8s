@@ -52,17 +52,17 @@ flowchart TD
     E -- non --> E1["workers bloqués au démarrage Julia :<br/>logs kubectl exec worker-pod,<br/>depot/project path incorrects"]
     E -- oui --> F{"TCP driver joignable<br/>depuis les pods ?"}
     F -- non --> F1["NetworkPolicy / CNI bloquant<br/>pod→pod sur ports éphémères"]
-    F -- oui --> G["augmenter launch_timeout=300<br/>et re-tester (cold start)"]
+    F -- oui --> G["augmenter SlurmManager(; launch_timeout=300)<br/>et re-tester (cold start)"]
 ```
 
 Erreurs typiques et significations :
 
 | Message | Cause racine |
 |---|---|
-| `SlurmManager must be constructed inside a slurm allocation environment` | driver lancé hors allocation (REPL/pod libre) |
+| `SlurmManager must be constructed inside a slurm allocation …` / `SLURM_JOB_ID or SLURM_JOBID must be defined` | driver lancé hors allocation (REPL/pod libre) |
 | `SLURM_NTASKS must be defined` | allocation sans `--ntasks` (ex. `salloc` sans ressources) |
-| `Timeout on waiting for 16 workers to start` | callback TCP bloqué ou workers morts - arbre ci-dessus |
-| `Job step aborted: Waiting up to 32 seconds` | exit sans `rmprocs` - cosmétique, diminuer avec `srun_post_exit_sleep` |
+| `launch_timeout exceeded` | callback TCP bloqué ou workers morts avant `SlurmManager(; launch_timeout=…)` - arbre ci-dessus |
+| `Job step aborted: Waiting up to 32 seconds` | exit sans `rmprocs(workers())` - cosmétique ; `rmprocs` en fin de script, éventuellement `SlurmManager(; srun_post_exit_sleep=…)` plus grand |
 
 ## 4. Sortie de job introuvable / vide
 

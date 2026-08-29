@@ -12,6 +12,7 @@
 #   julia --project=/opt/julia-examples /opt/julia-examples/02_monte_carlo_pi.jl
 
 using Distributed
+using Printf
 using Random
 using SlurmClusterManager
 
@@ -19,7 +20,8 @@ const N = get(ENV, "PI_SAMPLES", "100_000_000") |> s -> parse(Int, replace(s, "_
 
 @info "Allocation Slurm" samples = N workers_awaited = get(ENV, "SLURM_NTASKS", "?")
 
-addprocs(SlurmManager(); launch_timeout = 300.0)
+# launch_timeout est un kwarg du constructeur SlurmManager, pas de addprocs.
+addprocs(SlurmManager(; launch_timeout = 300.0))
 
 # Plusieurs morceaux par worker → meilleur équilibrage (calculé APRÈS addprocs).
 const CHUNKS = 8 * nworkers()

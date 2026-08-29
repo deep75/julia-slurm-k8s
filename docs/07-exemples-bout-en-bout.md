@@ -47,7 +47,7 @@ bonjour depuis worker 2 @ worker-0 (threads=1)
 bonjour depuis worker 3 @ worker-0 (threads=1)
 bonjour depuis worker 4 @ worker-1 (threads=1)
 bonjour depuis worker 5 @ worker-1 (threads=1)
-somme 1..1_000_000 par worker : OK (500000500000)
+somme 1..1_000_000 vérifiée sur 4 workers : OK (500000500000)
 [ Info: Terminé.
 ```
 
@@ -87,10 +87,10 @@ moyenne=…  min=…  max=…
 temps séquentiel équivalent ≈ … s → speedup ≈ 10-15x sur 16 workers
 ```
 
-Points techniques : `retry_n=3` + `retry_delays` (3 tentatives en cas de mort
-d'un worker, `retry_n` est obligatoire pour activer la reprise),
-`on_error=rethrow` (fail-fast), estimation du speedup par un lot
-séquentiel de référence.
+Points techniques : `retry_delays=ones(3)` → 3 tentatives espacées d'1 s en
+cas de mort d'un worker (le nombre de tentatives = `length(retry_delays)` ;
+`pmap` n'a **pas** de kwarg `retry_n`), `on_error=rethrow` (fail-fast après
+les tentatives), estimation du speedup par un lot séquentiel de référence.
 
 ## 5. `options` - kwargs et environnement
 
@@ -120,7 +120,7 @@ JULIA_PROJECT identique driver/worker : /opt/julia-examples/Project.toml  ✓
 salloc -N 2 --ntasks=16 bash
 julia --project=/opt/julia-examples
 julia> using Distributed, SlurmClusterManager
-julia> addprocs(SlurmManager(); launch_timeout=300.0)
+julia> addprocs(SlurmManager(; launch_timeout=300.0))
 julia> @everywhere println(myid(), " @ ", gethostname())
 julia> exit(); exit                    # libère l'allocation
 ```

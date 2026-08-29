@@ -100,7 +100,7 @@ grâce au DNS des pods (headless service Slinky).
 | Slurm (images) | `26.05-ubuntu26.04` | `ghcr.io/slinkyproject/*` |
 | Kubernetes | ≥ 1.29 | exigence du chart `slurm` |
 | SlurmClusterManager.jl | `1.1.0` | validé avec Julia **1.12.7** |
-| Julia | 1.10 - 1.12 | compat package : `julia = "1.0"` |
+| Julia | 1.10 - 1.12 | compat `julia/Project.toml` : `julia = "1.10"` |
 
 > Vérifiez les dernières releases avant une mise en production :
 > [slurm-operator/releases](https://github.com/SlinkyProject/slurm-operator/releases) ·

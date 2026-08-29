@@ -28,23 +28,25 @@ end
 # reste contrôlé par --cpus-per-task de l'allocation).
 worker_threads = max(1, parse(Int, get(ENV, "SLURM_CPUS_PER_TASK", "1")))
 
-@info "addprocs avec options" exeflags = "--threads=$worker_threads"
+@info "addprocs avec options" exeflags = "--threads=$worker_threads --check-bounds=yes"
 
+# launch_timeout est un kwarg du CONSTRUCTEUR SlurmManager ; dir/exeflags/env
+# sont, eux, des kwargs de addprocs (les seuls reconnus par SlurmClusterManager).
 addprocs(
-    SlurmManager();
+    SlurmManager(; launch_timeout = 300.0);
     dir = "/tmp",
     exeflags = `--threads=$worker_threads --check-bounds=yes`,
     env = ["JULIA_NUM_THREADS" => string(worker_threads)],
-    launch_timeout = 300.0,
 )
 
 for w in workers()
-    t = remotecall_fetch(w, () -> (gethostname(), Threads.nthreads(), pwd()))
+    # remotecall_fetch(f, id, args...) : la fonction d'abord, l'id ensuite.
+    t = remotecall_fetch(() -> (gethostname(), Threads.nthreads(), pwd()), w)
     println("worker $w : host=$(t[1])  threads=$(t[2])  dir=$(t[3])")
 end
 
 @info "JULIA_PROJECT actif côté driver" project = Base.active_project()
-proj = remotecall_fetch(first(workers()), () -> Base.active_project())
+proj = remotecall_fetch(() -> Base.active_project(), first(workers()))
 @assert proj == Base.active_project() "JULIA_PROJECT non propagé au worker"
 println("JULIA_PROJECT identique driver/worker : $proj  ✓")
 

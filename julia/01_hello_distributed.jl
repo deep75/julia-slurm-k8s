@@ -31,9 +31,10 @@ end
 
 # SlurmManager() n'accepte AUCUN argument Slurm (partition, ntasks...) :
 # toute la topologie vient de l'allocation sbatch/salloc existante.
-# Kwarg utiles uniquement : launch_timeout, srun_post_exit_sleep.
+# `launch_timeout` / `srun_post_exit_sleep` sont des kwargs du CONSTRUCTEUR
+# SlurmManager (pas de addprocs, qui ne reconnaît que dir/exename/exeflags/env).
 @info "Lancement des workers via srun..."
-addprocs(SlurmManager(); launch_timeout = 300.0)
+addprocs(SlurmManager(; launch_timeout = 300.0))
 
 @info "Workers connectés" nworkers = nworkers() procs = procs()
 
@@ -42,11 +43,12 @@ addprocs(SlurmManager(); launch_timeout = 300.0)
 @everywhere workers() println("bonjour depuis worker $(myid()) @ $(gethostname())" *
                               " (threads=$(Threads.nthreads()))")
 
-@info "Vérification : somme 1..1_000_000 calculée côté workers"
-total = sum(remotecall_fetch(w, x -> sum(1:x), 1_000_000) for w in workers())
+@info "Vérification : chaque worker calcule sum(1:1_000_000)"
 expected = 500_000_500_000
-@assert total == expected "somme incorrecte : $total != $expected"
-println("somme 1..1_000_000 par worker : OK ($total)")
+# remotecall_fetch(f, id, args...) : la fonction d'abord, l'id du worker ensuite.
+sommes = [remotecall_fetch(x -> sum(1:x), w, 1_000_000) for w in workers()]
+@assert all(==(expected), sommes) "sommes incorrectes : $sommes"
+println("somme 1..1_000_000 vérifiée sur $(nworkers()) workers : OK ($expected)")
 
 # Libère les workers proprement avant la fin du step.
 rmprocs(workers(); waitfor = 60)

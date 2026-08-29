@@ -28,20 +28,29 @@ flowchart LR
     end
     subgraph faux["❌ patrons impossibles"]
         RE["REPL / pod libre"] --> X1["erreur : SLURM_JOB_ID manquant"]
-        SMK["addprocs(SlurmManager(), partition=…)"] --> X2["aucun kwarg Slurm<br/>(launch_timeout, srun_post_exit_sleep seuls)"]
+        SMK["addprocs(SlurmManager(); partition=…)"] --> X2["aucun kwarg Slurm ;<br/>launch_timeout / srun_post_exit_sleep<br/>= kwargs du constructeur SlurmManager"]
     end
 ```
 
-Les kwargs supportés par `addprocs(SlurmManager(); …)` :
+**Deux jeux de kwargs distincts** (ne pas les confondre) :
+
+`SlurmManager(; …)` — kwargs du **constructeur** :
 
 | Kwarg | Défaut | Effet |
 |---|---|---|
-| `launch_timeout` | `60.0` s | délai max d'attente des connexions workers (mettre 300 en conteneur) |
-| `srun_post_exit_sleep` | `0.01` s | pause après sortie de srun (laisser Slurm enregistrer l'exit) |
+| `launch_timeout` | `60.0` s | délai max d'attente des connexions workers (mettre `300.0` en conteneur : pull d'image + cold start) |
+| `srun_post_exit_sleep` | `0.01` s | pause après sortie de `srun` (laisser Slurm enregistrer l'exit) |
+
+`addprocs(mgr; …)` — les **seuls** kwargs reconnus par SlurmClusterManager
+v1.1.0 (tout autre, `launch_timeout` compris, déclenche un `@warn` et est
+**ignoré**) :
+
+| Kwarg | Défaut | Effet |
+|---|---|---|
 | `dir` | `pwd()` | répertoire de travail passé à `srun -D` |
-| `exename` | `Sys.BINDIR/julia` | binaire Julia des workers |
-| `exeflags` | - | drapeaux ajoutés aux workers (ex. `--threads=N`) |
-| `env` | - | variables ajoutées aux workers (Julia ≥ 1.6) |
+| `exename` | `$(Sys.BINDIR)/julia` | binaire Julia des workers |
+| `exeflags` | `` `` `` (Cmd vide) | drapeaux des workers — `Cmd` ou `String` d'**un seul** flag (ex. `` `--threads=2` ``) |
+| `env` | `[]` | variables ajoutées aux workers (Julia ≥ 1.6) |
 
 Propagation automatique driver → workers : **`JULIA_PROJECT`**,
 **`JULIA_LOAD_PATH`**, **`JULIA_DEPOT_PATH`** (via `addenv` sur srun).
@@ -111,10 +120,12 @@ flowchart TB
 
 ## 5. Bonnes pratiques sur Slinky
 
-1. **`launch_timeout=300.0`** : le premier `srun` d'une image fraîchement
-   déployée peut être lent (pull image, cold start).
+1. **`addprocs(SlurmManager(; launch_timeout=300.0))`** : le premier `srun`
+   d'une image fraîchement déployée peut être lent (pull image, cold start).
+   `launch_timeout` est un kwarg du **constructeur** `SlurmManager`, pas de
+   `addprocs` (§1).
 2. **Threads vs tâches** : `--cpus-per-task=2` à l'allocation +
-   `exeflags="--threads=2"` côté workers ; ne doublez pas les deux.
+   `` exeflags=`--threads=2` `` côté workers ; ne doublez pas les deux.
 3. **Projet actif** : lancez toujours `julia --project=/opt/julia-examples`
    (ou `JULIA_PROJECT` env) pour que la propagation couvre les workers.
 4. **Données volumineuses** : partagez par volume RWX monté sur le NodeSet

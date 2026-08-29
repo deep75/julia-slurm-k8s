@@ -35,8 +35,9 @@ RUN set -eux; \
       *) echo "TARGETARCH non supporté : ${TARGETARCH}" >&2; exit 1 ;; \
     esac; \
     tarball="julia-${JULIA_VERSION}-linux-${tarball_arch}.tar.gz"; \
+    julia_series="${JULIA_VERSION%.*}"; \
     wget -q -O "/tmp/${tarball}" \
-      "https://julialang-s3.julialang.org/bin/linux/${julia_arch}/${JULIA_VERSION%%.*}/${tarball}"; \
+      "https://julialang-s3.julialang.org/bin/linux/${julia_arch}/${julia_series}/${tarball}"; \
     mkdir -p /usr/local/julia; \
     tar -xzf "/tmp/${tarball}" -C /usr/local/julia --strip-components=1; \
     rm "/tmp/${tarball}"; \
