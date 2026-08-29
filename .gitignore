@@ -27,3 +27,6 @@ kind-config-generated.yaml
 
 # macOS
 .DS_Store
+
+# Pages Literate générées au build
+/docs/src/exemples/
