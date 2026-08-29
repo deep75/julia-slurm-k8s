@@ -1,0 +1,13 @@
+# Statistiques de langages GitHub (Linguist).
+# Objectif : la barre de langages reflète le CODE (Shell + Julia),
+# la documentation Markdown ne doit pas la masquer.
+
+# Julia : détection et comptabilisation explicites.
+*.jl linguist-language=Julia linguist-detectable=true
+
+# Les scripts sbatch sont du Shell (extension non reconnue par Linguist).
+*.sbatch linguist-language=Shell
+
+# Documentation : exclue des statistiques de langages.
+docs/** linguist-documentation
+README.md linguist-documentation
