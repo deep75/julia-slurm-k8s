@@ -1,5 +1,9 @@
 # Julia + Slurm sur Kubernetes - Slinky (slurm-operator) + SlurmClusterManager.jl
 
+| **Documentation** | **Build Status** |
+|:-----------------:|:----------------:|
+| [![docs en ligne](https://img.shields.io/badge/docs-en%20ligne-blue.svg)](https://deep75.github.io/julia-slurm-k8s/) | [![Documentation](https://github.com/deep75/julia-slurm-k8s/actions/workflows/Documentation.yml/badge.svg?branch=main)](https://github.com/deep75/julia-slurm-k8s/actions/workflows/Documentation.yml) [![GitHub Pages](https://img.shields.io/github/deployments/deep75/julia-slurm-k8s/github-pages?label=github%20pages&logo=github)](https://deep75.github.io/julia-slurm-k8s/) |
+
 Dépôt de référence pour faire tourner des charges **Julia `Distributed`** sur un
 cluster **Slurm** entièrement orchestré dans **Kubernetes** par l'opérateur
 [SlinkyProject/slurm-operator](https://github.com/SlinkyProject/slurm-operator)
@@ -9,6 +13,8 @@ cluster **Slurm** entièrement orchestré dans **Kubernetes** par l'opérateur
 > **Tout est théorique et livré prêt à l'emploi** : scripts bash, manifests Helm,
 > exemples Julia, image conteneur. Aucune commande de ce dépôt n'est exécutée
 > automatiquement - chaque étape est déclenchée par vous, sur VOTRE cluster.
+
+📖 **Documentation en ligne :** <https://deep75.github.io/julia-slurm-k8s/>
 
 ## Vue d'ensemble
 
@@ -49,7 +55,7 @@ grâce au DNS des pods (headless service Slinky).
 
 | Chemin | Rôle |
 |---|---|
-| [`docs/`](docs/) | Documentation technique complète (8 chapitres, schémas Mermaid) |
+| [`docs/`](docs/src/) | Documentation technique complète (8 chapitres, schémas Mermaid) — build Documenter via [`docs/make.jl`](docs/make.jl) |
 | [`scripts/`](scripts/) | Pipeline bash numéroté : prérequis → operator → image → cluster → démo |
 | [`k8s/`](k8s/) | Values Helm du cluster Slurm + config kind de démo |
 | [`docker/julia-slurm/`](docker/julia-slurm/) | Dockerfile : image `slurmd` + Julia + depot précompilé |
@@ -59,14 +65,26 @@ grâce au DNS des pods (headless service Slinky).
 
 | Chapitre | Contenu |
 |---|---|
-| [01 - Architecture](docs/01-architecture.md) | Composants Slinky, CRDs, réseau, modèle d'exécution Julia |
-| [02 - Prérequis & installation](docs/02-prerequis-installation.md) | Outils, versions, cert-manager, Kubernetes ≥ 1.29 |
-| [03 - Déploiement du cluster Slurm](docs/03-deploiement-slurm.md) | Chart `slurm`, values, vérifications |
-| [04 - Images conteneurs](docs/04-images-conteneurs.md) | Images officielles, image Julia custom, distribution |
-| [05 - Julia Distributed sur Slurm](docs/05-julia-distributed-slurm.md) | Contrat de `SlurmManager()`, flux interne, bonnes pratiques |
-| [06 - Soumission de jobs](docs/06-soumission-jobs.md) | sbatch/srun via pod de login, API REST, slurm-bridge |
-| [07 - Exemples bout-en-bout](docs/07-exemples-bout-en-bout.md) | Les 4 exemples pas à pas, sorties attendues |
-| [08 - Troubleshooting](docs/08-troubleshooting.md) | Arbres de diagnostic, erreurs courantes, correctifs |
+| [01 - Architecture](docs/src/01-architecture.md) | Composants Slinky, CRDs, réseau, modèle d'exécution Julia |
+| [02 - Prérequis & installation](docs/src/02-prerequis-installation.md) | Outils, versions, cert-manager, Kubernetes ≥ 1.29 |
+| [03 - Déploiement du cluster Slurm](docs/src/03-deploiement-slurm.md) | Chart `slurm`, values, vérifications |
+| [04 - Images conteneurs](docs/src/04-images-conteneurs.md) | Images officielles, image Julia custom, distribution |
+| [05 - Julia Distributed sur Slurm](docs/src/05-julia-distributed-slurm.md) | Contrat de `SlurmManager()`, flux interne, bonnes pratiques |
+| [06 - Soumission de jobs](docs/src/06-soumission-jobs.md) | sbatch/srun via pod de login, API REST, slurm-bridge |
+| [07 - Exemples bout-en-bout](docs/src/07-exemples-bout-en-bout.md) | Les 4 exemples pas à pas, sorties attendues |
+| [08 - Troubleshooting](docs/src/08-troubleshooting.md) | Arbres de diagnostic, erreurs courantes, correctifs |
+
+Build local du site (Documenter.jl) :
+
+```bash
+julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+julia --project=docs docs/make.jl        # → docs/build/index.html
+```
+
+Déploiement GitHub Pages automatisé par
+[`.github/workflows/Documentation.yml`](.github/workflows/Documentation.yml)
+(branche `gh-pages`). Activer une fois : *Settings → Pages → Source =
+« Deploy from a branch » → `gh-pages` / `root`*.
 
 ## Démarrage rapide
 

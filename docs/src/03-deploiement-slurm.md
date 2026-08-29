@@ -23,7 +23,7 @@ flowchart LR
 
 ## 2. Values - les blocs qui comptent
 
-Source : [`k8s/00-values-slurm.yaml`](../k8s/00-values-slurm.yaml) (calqué sur
+Source : [`k8s/00-values-slurm.yaml`](https://github.com/deep75/julia-slurm-k8s/blob/main/k8s/00-values-slurm.yaml) (calqué sur
 `helm/slurm/values.yaml` v1.3.0-rc1).
 
 | Bloc | Clés utilisées | Effet |

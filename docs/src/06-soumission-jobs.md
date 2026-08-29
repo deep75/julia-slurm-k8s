@@ -97,7 +97,7 @@ WORKER=$(kubectl get pods -n slurm -o name | cut -d/ -f2 | grep julia | head -1)
 kubectl exec -n slurm "$WORKER" -- cat /tmp/slurm-<JOBID>.out
 ```
 
-Le script [`scripts/05-run-julia-demo.sh`](../scripts/05-run-julia-demo.sh)
+Le script [`scripts/05-run-julia-demo.sh`](https://github.com/deep75/julia-slurm-k8s/blob/main/scripts/05-run-julia-demo.sh)
 automatise tout ce cycle (cp → sbatch --parsable → polling JobState → cat).
 
 En interactif (`salloc`/`srun` attaché), la sortie revient en continu dans le

@@ -2,7 +2,7 @@
 
 ← [06 - Soumission de jobs](06-soumission-jobs.md) | [08 - Troubleshooting →](08-troubleshooting.md)
 
-Les quatre scripts de [`julia/`](../julia/) s'exécutent **dans une allocation
+Les quatre scripts de [`julia/`](https://github.com/deep75/julia-slurm-k8s/tree/main/julia) s'exécutent **dans une allocation
 Slurm** sur les pods NodeSet (image `julia-slurmd`). Chemins dans le pod :
 `/opt/julia-examples` (projet), depot précompilé à `/opt/julia/depot`.
 

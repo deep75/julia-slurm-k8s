@@ -15,6 +15,9 @@ env.local.sh
 build/
 dist/
 
+# Documenter.jl (build local du site — docs/build/ est couvert par build/ ci-dessus)
+/docs/build/
+
 # Slurm / Munge artefacts locaux
 munge.key
 slurm.conf.bak

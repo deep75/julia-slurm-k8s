@@ -18,7 +18,7 @@ Pourquoi customiser **slurmd** uniquement ? Les steps Slurm s'exécutent
 
 ## 2. L'image `julia-slurmd`
 
-Source : [`docker/julia-slurm/Dockerfile`](../docker/julia-slurm/Dockerfile)
+Source : [`docker/julia-slurm/Dockerfile`](https://github.com/deep75/julia-slurm-k8s/blob/main/docker/julia-slurm/Dockerfile)
 
 ```mermaid
 flowchart TD

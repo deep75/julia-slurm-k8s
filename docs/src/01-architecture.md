@@ -1,6 +1,6 @@
 # 01 - Architecture
 
-← [README](../README.md) | [02 - Prérequis →](02-prerequis-installation.md)
+← [Accueil](index.md) | [02 — Prérequis →](02-prerequis-installation.md)
 
 Ce chapitre décrit comment Slinky compose un cluster Slurm dans Kubernetes et
 où se place Julia dans ce modèle.

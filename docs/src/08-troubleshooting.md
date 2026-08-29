@@ -1,6 +1,6 @@
 # 08 - Troubleshooting
 
-← [07 - Exemples bout-en-bout](07-exemples-bout-en-bout.md) | [README →](../README.md)
+← [07 — Exemples bout-en-bout](07-exemples-bout-en-bout.md) | [Accueil →](index.md)
 
 ## 1. Diagnostic général
 
@@ -110,4 +110,4 @@ kubectl delete crds $(kubectl get crds -o name | grep slinky.slurm.net | cut -d/
 ./scripts/01-kind-cluster.sh down   # si kind
 ```
 
-→ Retour : [README](../README.md)
+→ Retour : [Accueil](index.md)
